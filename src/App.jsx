@@ -1,3 +1,4 @@
+// LIbraries
 import {
   ApolloClient,
   ApolloProvider,
@@ -12,11 +13,14 @@ import { authenticatedFetch } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { AppProvider as PolarisProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
+
+// CSS
 import "@shopify/polaris/build/esm/styles.css";
 
-import { HomePage } from "./components/HomePage";
+// Views
+import { Home } from "./views";
 
-export default function App() {
+const App = () => {
   return (
     <PolarisProvider i18n={translations}>
       <AppBridgeProvider
@@ -27,12 +31,12 @@ export default function App() {
         }}
       >
         <MyProvider>
-          <HomePage />
+          <Home />
         </MyProvider>
       </AppBridgeProvider>
     </PolarisProvider>
   );
-}
+};
 
 function MyProvider({ children }) {
   const app = useAppBridge();
@@ -69,3 +73,5 @@ export function userLoggedInFetch(app) {
     return response;
   };
 }
+
+export default App;
