@@ -1,4 +1,4 @@
-// @ts-check
+// Libraries
 import { resolve } from "path";
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -7,8 +7,12 @@ import morgan from "morgan";
 import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 
+// Middlewares
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
+
+// Routes
+import fieldRouter from "./routes/fieldRoutes.js";
 
 const prisma = new PrismaClient();
 
@@ -48,10 +52,14 @@ export async function createServer(
   app.set("active-shopify-shops", ACTIVE_SHOPIFY_SHOPS);
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
 
+  // Middlewares
   app.use(morgan("tiny"));
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
 
   applyAuthMiddleware(app);
+
+  // Routers
+  app.use("/api/v1/fields", fieldRouter);
 
   app.post("/webhooks", async (req, res) => {
     try {

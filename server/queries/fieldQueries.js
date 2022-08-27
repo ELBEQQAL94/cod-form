@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createFields = async (userId) => {
+export const createFieldsQuery = async (userId) => {
   await prisma.field.createMany({
     data: [
       {
@@ -89,7 +89,7 @@ export const createFields = async (userId) => {
   });
 };
 
-export const createCurrentFields = async (userId) => {
+export const createCurrentFieldsQuery = async (userId) => {
   let currentFields = await prisma.field.findMany({
     where: {
       userId,
@@ -112,7 +112,19 @@ export const createCurrentFields = async (userId) => {
   });
 };
 
-export const getRestFields = async (userId) => {
+export const getCurrentFieldsQuery = async (userId) => {
+  const currentFields = await prisma.user.findMany({
+    where: {
+      id: userId,
+    },
+    include: {
+      currentFieldsOnUsers: { include: { field: true } },
+    },
+  });
+  return currentFields;
+};
+
+export const getShopifyFieldsQuery = async (userId) => {
   const fields = await prisma.field.findMany({
     where: {
       userId,

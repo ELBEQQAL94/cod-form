@@ -3,9 +3,9 @@ import { Shopify } from "@shopify/shopify-api";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 
 // Queries
-import { createUser, findUser } from "../queries/userQueries.js";
+import { createUserQuery, findUserQuery } from "../queries/userQueries.js";
 
-export default function applyAuthMiddleware(app) {
+const applyAuthMiddleware = (app) => {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
       return res.redirect(
@@ -71,8 +71,8 @@ export default function applyAuthMiddleware(app) {
           `Failed to register APP_UNINSTALLED webhook: ${response.result}`
         );
       }
-      const user = await findUser(session.shop);
-      if (!user) await createUser(session.shop, session.accessToken);
+      const user = await findUserQuery(session.shop);
+      if (!user) await createUserQuery(session.shop, session.accessToken);
       // TODO:IF EXISTS UPDATE ACCESS TOKEN
       res.redirect(`/?shop=${session.shop}&host=${host}`);
     } catch (e) {
@@ -83,7 +83,6 @@ export default function applyAuthMiddleware(app) {
           break;
         case e instanceof Shopify.Errors.CookieNotFound:
         case e instanceof Shopify.Errors.SessionNotFound:
-          // This is likely because the OAuth session cookie expired before the merchant approved the request
           res.redirect(`/auth?shop=${req.query.shop}`);
           break;
         default:
@@ -93,4 +92,6 @@ export default function applyAuthMiddleware(app) {
       }
     }
   });
-}
+};
+
+export default applyAuthMiddleware;
