@@ -4,30 +4,32 @@ import { Page, Layout } from "@shopify/polaris";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { nanoid } from "nanoid";
 
-const itemsFromBackend = [
-  { id: nanoid(), content: "First task" },
-  { id: nanoid(), content: "Second task" },
-  { id: nanoid(), content: "Third task" },
-  { id: nanoid(), content: "Fourth task" },
-  { id: nanoid(), content: "Fifth task" },
+const shopifyFields = [
+  { id: nanoid(), content: "Last Name" },
+  { id: nanoid(), content: "Province" },
+  { id: nanoid(), content: "Address 1" },
+  { id: nanoid(), content: "Confirm Phone" },
+  { id: nanoid(), content: "Email" },
+  { id: nanoid(), content: "Zip" },
+  { id: nanoid(), content: "Address 2" },
+];
+
+const currentFields = [
+  { id: nanoid(), content: "First Name" },
+  { id: nanoid(), content: "Phone" },
+  { id: nanoid(), content: "Note" },
+  { id: nanoid(), content: "City" },
+  { id: nanoid(), content: "Country" },
 ];
 
 const columnsFromBackend = {
   [nanoid()]: {
-    name: "Requested",
-    items: itemsFromBackend,
+    name: "Shopify Fields",
+    items: shopifyFields,
   },
   [nanoid()]: {
-    name: "To do",
-    items: [],
-  },
-  [nanoid()]: {
-    name: "In Progress",
-    items: [],
-  },
-  [nanoid()]: {
-    name: "Done",
-    items: [],
+    name: "Current Fields",
+    items: currentFields,
   },
 };
 
@@ -148,6 +150,37 @@ const Home = () => {
             );
           })}
         </DragDropContext>
+        <div
+          style={{
+            background: "lightgrey",
+            padding: 4,
+            width: 250,
+            minHeight: 500,
+          }}
+        >
+          {Object.entries(columns).map(([columnId, column], index) => {
+            if (column.name === "Current Fields") {
+              return (
+                <div>
+                  <h1>Preview</h1>
+                  {column.items.map((item) => (
+                    <div
+                      style={{
+                        padding: 16,
+                        margin: "0 0 8px 0",
+                        minHeight: "50px",
+                        backgroundColor: "#263B4A",
+                        color: "white",
+                      }}
+                    >
+                      {item.content}
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+          })}
+        </div>
       </div>
     </Page>
   );

@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String                 @id @default(uuid())
+  shop                 String                 @unique
+  accessToken          String
+  createdAt            DateTime               @default(now())
+  fields               Field[]
+  currentFieldsOnUsers CurrentFieldsOnUsers[]
+}
+
+model Field {
+  id                   String                 @id @default(uuid())
+  type                 String?                @default("text")
+  label                String                 @unique
+  placeholder          String                 @unique
+  requiredMessage      String
+  ErrorMessage         String?
+  required             Boolean?               @default(false)
+  owner                User                   @relation(fields: [userId], references: [id])
+  userId               String
+  currentFieldsOnUsers CurrentFieldsOnUsers[]
+}
+
+// 'id' => '14294',
+// 			'customer_id' => '1378',
+// 			'name' => 'firstname',
+// 			'label' => 'First Name',
+// 			'status' => '1',
+// 			'categorie' => 'Customer',
+// 			'icon' => 'user',
+// 			'icons' => 'user{}user-o{}user-circle{}user-circle-o{}id-card{}id-card-o',
+// 			'position' => '1',
+// 			'field_order' => '1',
+// 			'required' => null,
+// 			'label_text' => 'First Name',
+// 			'placeholder' => 'First Name',
+// 			'original_label_text' => 'First Name',
+// 			'original_placeholder' => 'First Name',
+// 			'required_text' => 'First name is required',
+// 			'error_text' => 'First name should not contain any numeric characters',
+// 			'dropdown' => null,
+// 			'updated' => '2022-08-23 17:39:04'
+
+model CurrentFieldsOnUsers {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  field   Field  @relation(fields: [fieldId], references: [id])
+  fieldId String
+
+  @@id([userId, fieldId])
+}

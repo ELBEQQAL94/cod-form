@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Field" ALTER COLUMN "ErrorMessage" DROP NOT NULL,
+ALTER COLUMN "required" DROP NOT NULL;

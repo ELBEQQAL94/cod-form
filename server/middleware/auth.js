@@ -2,6 +2,9 @@ import { Shopify } from "@shopify/shopify-api";
 
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 
+// Queries
+import { createUser, findUser } from "../queries/userQueries.js";
+
 export default function applyAuthMiddleware(app) {
   app.get("/auth", async (req, res) => {
     if (!req.signedCookies[app.get("top-level-oauth-cookie")]) {
@@ -68,8 +71,9 @@ export default function applyAuthMiddleware(app) {
           `Failed to register APP_UNINSTALLED webhook: ${response.result}`
         );
       }
-
-      // Redirect to app with shop parameter upon auth
+      const user = await findUser(session.shop);
+      if (!user) await createUser(session.shop, session.accessToken);
+      // TODO:IF EXISTS UPDATE ACCESS TOKEN
       res.redirect(`/?shop=${session.shop}&host=${host}`);
     } catch (e) {
       switch (true) {

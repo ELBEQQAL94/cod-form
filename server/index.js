@@ -3,14 +3,17 @@ import { resolve } from "path";
 import express from "express";
 import cookieParser from "cookie-parser";
 import { Shopify, LATEST_API_VERSION } from "@shopify/shopify-api";
+import morgan from "morgan";
+import { PrismaClient } from "@prisma/client";
 import "dotenv/config";
 
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
 
+const prisma = new PrismaClient();
+
 const USE_ONLINE_TOKENS = true;
 const TOP_LEVEL_OAUTH_COOKIE = "shopify_top_level_oauth";
-
 const PORT = parseInt(process.env.PORT || "8081", 10);
 const isTest = process.env.NODE_ENV === "test" || !!process.env.VITE_TEST_BUILD;
 
@@ -45,6 +48,7 @@ export async function createServer(
   app.set("active-shopify-shops", ACTIVE_SHOPIFY_SHOPS);
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
 
+  app.use(morgan("tiny"));
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
 
   applyAuthMiddleware(app);
@@ -59,6 +63,81 @@ export async function createServer(
         res.status(500).send(error.message);
       }
     }
+  });
+
+  app.get("/api/v1/users", async (req, res, next) => {
+    try {
+      const shops = await prisma.user.findMany();
+      return res.json(shops);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.post("/api/v1/users", async (req, res, next) => {
+    // AFTER CREATE USER
+    // CREATE ALL FIELDS WITH OWNER ID
+    // CREATE CURRENT FIELDS
+    try {
+      const user = await prisma.user.create({
+        data: {
+          shop: "shop",
+          accessToken: "access token",
+        },
+      });
+      return res.json({
+        message: "user created!",
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/v1/fields", async (req, res, next) => {
+    try {
+      const shops = await prisma.field.findMany({});
+      return res.json(shops);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/v1/current-fields", async (req, res) => {
+    // NEED USER ID
+    const { userId } = req.query;
+    const test = await prisma.user.findMany({
+      where: {
+        id: userId,
+      },
+      include: {
+        currentFieldsOnUsers: { include: { field: true } },
+      },
+    });
+    // const getCurrentFields = await prisma.currentFieldsOnUsers.findMany({
+    //   where: {
+    //     userId
+    //   }
+    // });
+    res.json(test);
+  });
+
+  app.get("/api/v1/rest-fields", async (req, res) => {
+    const { userId } = req.query;
+    const fields = await prisma.field.findMany({
+      where: {
+        userId,
+      },
+    });
+    const currentFields = await prisma.currentFieldsOnUsers.findMany({
+      where: {
+        userId,
+      },
+    });
+    const restFields = fields.filter(
+      (field) =>
+        !currentFields.find((currentField) => currentField.fieldId === field.id)
+    );
+    res.json(restFields);
   });
 
   app.get("/products-count", verifyRequest(app), async (req, res) => {
