@@ -11,7 +11,15 @@ shopify app serve
 
 ---
 
-[ ] Fetch shopify fields, current field
+[x] Get userId
+[x] Fetch shopify fields, current field
+[x] Display shopify fields
+[x] Display current fields
+[x] Return current field where user id is
+[ ] Create component for field
+[ ] Style columne
+[ ] Remove inline-style
+[ ] Create input for form
 [ ] Preview Forms
 [ ] Add form directly
 [ ] Add form as popup
@@ -23,6 +31,11 @@ shopify app serve
 [ ] Update field
 [ ] Add ability to change field type
 [ ] Remove all migrations
+[ ] Remove unused api
+
+# Stretch
+
+[ ] Add try/catch on call api
 
 # After deploy
 

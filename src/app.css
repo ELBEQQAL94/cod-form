@@ -1,0 +1,34 @@
+:root {
+  --gray-color: #f6f6f7;
+  --gray-deep-color: #ededf4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+/**
+BACKGROUND COLORS
+*****************/
+.bg-gray-color {
+  background-color: var(--gray-color) !important;
+}
+
+.bg-gray-deep-color {
+  background-color: var(--gray-deep-color) !important;
+}
+
+.field-container {
+  background: white;
+  color: gray;
+  user-select: none;
+  padding: 16;
+  margin: 0 0 8px 0;
+  min-height: 50px;
+}

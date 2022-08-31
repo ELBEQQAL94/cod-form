@@ -9,16 +9,17 @@ import {
   Provider as AppBridgeProvider,
   useAppBridge,
 } from "@shopify/app-bridge-react";
-import { authenticatedFetch } from "@shopify/app-bridge-utils";
+import { authenticatedFetch, getSessionToken } from "@shopify/app-bridge-utils";
 import { Redirect } from "@shopify/app-bridge/actions";
 import { AppProvider as PolarisProvider } from "@shopify/polaris";
 import translations from "@shopify/polaris/locales/en.json";
 
-// CSS
-import "@shopify/polaris/build/esm/styles.css";
-
 // Views
 import { Home } from "./views";
+
+// CSS
+import "@shopify/polaris/build/esm/styles.css";
+import "./app.css";
 
 const App = () => {
   return (
@@ -45,14 +46,17 @@ function MyProvider({ children }) {
     cache: new InMemoryCache(),
     link: new HttpLink({
       credentials: "include",
-      fetch: userLoggedInFetch(app),
+      headers: {
+        "Content-Type": "application/graphql",
+      },
+      fetch: authenticatedFetch(app),
     }),
   });
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
 
-export function userLoggedInFetch(app) {
+export async function userLoggedInFetch(app) {
   const fetchFunction = authenticatedFetch(app);
 
   return async (uri, options) => {

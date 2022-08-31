@@ -13,6 +13,7 @@ import verifyRequest from "./middleware/verify-request.js";
 
 // Routes
 import fieldRouter from "./routes/fieldRoutes.js";
+import userRouter from "./routes/userRoutes.js";
 
 const prisma = new PrismaClient();
 
@@ -60,6 +61,7 @@ export async function createServer(
 
   // Routers
   app.use("/api/v1/fields", fieldRouter);
+  app.use("/api/v1/users", userRouter);
 
   app.post("/webhooks", async (req, res) => {
     try {

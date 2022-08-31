@@ -74,6 +74,7 @@ const applyAuthMiddleware = (app) => {
       const user = await findUserQuery(session.shop);
       if (!user) await createUserQuery(session.shop, session.accessToken);
       // TODO:IF EXISTS UPDATE ACCESS TOKEN
+
       res.redirect(`/?shop=${session.shop}&host=${host}`);
     } catch (e) {
       switch (true) {
