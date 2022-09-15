@@ -11,11 +11,6 @@ shopify app serve
 
 ---
 
-[x] Get userId
-[x] Fetch shopify fields, current field
-[x] Display shopify fields
-[x] Display current fields
-[x] Return current field where user id is
 [ ] Create component for field
 [ ] Style columne
 [ ] Remove inline-style
