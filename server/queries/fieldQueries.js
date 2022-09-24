@@ -85,6 +85,11 @@ export const createFieldsQuery = async (userId) => {
         ErrorMessage: "Please enter a valid phone number",
         userId,
       },
+      {
+        type: "button",
+        label: "Confirm Order",
+        userId,
+      },
     ],
   });
 };

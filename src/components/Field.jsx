@@ -1,6 +1,9 @@
 // Libraries
 import { Icon } from "@shopify/polaris";
-import { EditMajor } from "@shopify/polaris-icons";
+import { ComposeMajor } from "@shopify/polaris-icons";
+
+// Components
+import FieldIcon from "./FieldIcon";
 
 const Field = ({ field, provided, snapshot }) => (
   <div
@@ -11,10 +14,10 @@ const Field = ({ field, provided, snapshot }) => (
     style={{ ...provided.draggableProps.style }}
   >
     <div className="field-container__label">
-      <div>ICON</div>
+      <FieldIcon label={field.label} />
       <p>{field.label}</p>
     </div>
-    <Icon source={EditMajor} color="highlight" />
+    <Icon source={ComposeMajor} color="highlight" />
   </div>
 );
 

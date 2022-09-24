@@ -14,7 +14,7 @@
     "test": "vitest --reporter=verbose",
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:seed": "npx prisma db seed",
-    "prisma:reset": "prisma migrate reset"
+    "prisma:reset": "npx prisma migrate reset"
   },
   "prisma": {
     "seed": "node ./server/prisma/seed.js"

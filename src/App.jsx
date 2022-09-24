@@ -50,13 +50,14 @@ function MyProvider({ children }) {
         "Content-Type": "application/graphql",
       },
       fetch: authenticatedFetch(app),
+      // fatch: userLoggedInFetch(app)
     }),
   });
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
 
-export async function userLoggedInFetch(app) {
+export function userLoggedInFetch(app) {
   const fetchFunction = authenticatedFetch(app);
 
   return async (uri, options) => {
@@ -77,5 +78,27 @@ export async function userLoggedInFetch(app) {
     return response;
   };
 }
+
+// export async function userLoggedInFetch(app) {
+//   const fetchFunction = authenticatedFetch(app);
+
+//   return async (uri, options) => {
+//     const response = await fetchFunction(uri, options);
+
+//     if (
+//       response.headers.get("X-Shopify-API-Request-Failure-Reauthorize") === "1"
+//     ) {
+//       const authUrlHeader = response.headers.get(
+//         "X-Shopify-API-Request-Failure-Reauthorize-Url"
+//       );
+
+//       const redirect = Redirect.create(app);
+//       redirect.dispatch(Redirect.Action.APP, authUrlHeader || `/auth`);
+//       return null;
+//     }
+
+//     return response;
+//   };
+// }
 
 export default App;

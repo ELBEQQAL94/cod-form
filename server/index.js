@@ -60,6 +60,7 @@ export async function createServer(
   applyAuthMiddleware(app);
 
   // Routers
+  app.use("/api/hello", (req, res) => res.json({ message: "Api works!" }));
   app.use("/api/v1/fields", fieldRouter);
   app.use("/api/v1/users", userRouter);
 

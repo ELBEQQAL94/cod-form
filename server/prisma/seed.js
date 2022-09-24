@@ -73,6 +73,10 @@ async function main() {
         requiredMessage: "Phone is required",
         ErrorMessage: "Please enter a valid phone number",
       },
+      {
+        type: "button",
+        label: "Confirm order",
+      },
     ],
   });
 }

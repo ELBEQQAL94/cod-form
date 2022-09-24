@@ -7,15 +7,33 @@ shopify app serve
 
 ```
 
+# Update theme app extension
+
+```
+shopify extension create
+shopify extension register
+cd theme-app-extension/shopify extension push
+
+```
+
 # TODOS
 
 ---
 
-[ ] Create component for field
-[ ] Style columne
-[ ] Remove inline-style
-[ ] Create input for form
+[ ] Update field table
+_ title form
+_ subt title form
+_ quantity
+_ button confirm order
+_ run new migration
+_ display title
+_ display sub title
+_ display confirm order button
+[ ] Create basic form with styling
+_ source: https://shopify.dev/apps/online-store/theme-app-extensions/extensions-framework
+_ https://cod-order-form-demo-b.myshopify.com/products/complex-cash-on-delivery-form
 [ ] Preview Forms
+[ ] Remove inline-style
 [ ] Add form directly
 [ ] Add form as popup
 [ ] Set up google sheet
@@ -27,6 +45,7 @@ shopify app serve
 [ ] Add ability to change field type
 [ ] Remove all migrations
 [ ] Remove unused api
+[ ] Add loading to home page
 
 # Stretch
 
