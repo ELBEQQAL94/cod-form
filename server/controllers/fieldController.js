@@ -6,9 +6,9 @@ import {
 
 // GET SHOPIFY FIELDS
 export const getShopifyFieldsController = async (req, res) => {
-  const { userId } = req.params;
-  const shopifyFields = await getShopifyFieldsQuery(userId);
-  const currentFields = await getCurrentFieldsQuery(userId);
+  const { storeId } = req.params;
+  const shopifyFields = await getShopifyFieldsQuery(storeId);
+  const currentFields = await getCurrentFieldsQuery(storeId);
 
   return res.status(200).json({
     status: 200,

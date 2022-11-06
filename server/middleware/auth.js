@@ -3,7 +3,8 @@ import { Shopify } from "@shopify/shopify-api";
 import topLevelAuthRedirect from "../helpers/top-level-auth-redirect.js";
 
 // Queries
-import { createUserQuery, findUserQuery } from "../queries/userQueries.js";
+import { updateStoreQuery } from "../queries/storeQueries.js";
+import { deleteSessionQuery } from "../queries/sessionQueries.js";
 
 const applyAuthMiddleware = (app) => {
   app.get("/auth", async (req, res) => {
@@ -71,8 +72,8 @@ const applyAuthMiddleware = (app) => {
           `Failed to register APP_UNINSTALLED webhook: ${response.result}`
         );
       }
-      const user = await findUserQuery(session.shop);
-      if (!user) await createUserQuery(session.shop, session.accessToken);
+      // const user = await findUserQuery(session.shop);
+      // if (!user) await createUserQuery(session.shop, session.accessToken);
       // TODO:IF EXISTS UPDATE ACCESS TOKEN
 
       res.redirect(`/?shop=${session.shop}&host=${host}`);
@@ -84,6 +85,12 @@ const applyAuthMiddleware = (app) => {
           break;
         case e instanceof Shopify.Errors.CookieNotFound:
         case e instanceof Shopify.Errors.SessionNotFound:
+          // This is likely because the OAuth session cookie expired before the merchant approved the request
+          // Delete sessions and restart installation
+          await updateStoreQuery(req.query.shop, { isActive: false });
+          // await StoreModel.findOneAndUpdate({ shop }, { isActive: false });
+          // await SessionModel.deleteMany({ shop });
+          await deleteSessionQuery(req.query.shop);
           res.redirect(`/auth?shop=${req.query.shop}`);
           break;
         default:

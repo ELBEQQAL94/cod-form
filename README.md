@@ -20,8 +20,9 @@ cd theme-app-extension/shopify extension push
 
 ---
 
+[ ] Add app*uninstalled custom web hook
 [ ] Update field table
-_ title form
+* title form
 _ subt title form
 _ quantity
 _ button confirm order
@@ -31,7 +32,7 @@ _ display sub title
 _ display confirm order button
 [ ] Create basic form with styling
 _ source: https://shopify.dev/apps/online-store/theme-app-extensions/extensions-framework
-_ https://cod-order-form-demo-b.myshopify.com/products/complex-cash-on-delivery-form
+\_ https://cod-order-form-demo-b.myshopify.com/products/complex-cash-on-delivery-form
 [ ] Preview Forms
 [ ] Remove inline-style
 [ ] Add form directly

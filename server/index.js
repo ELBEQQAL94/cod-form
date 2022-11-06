@@ -10,10 +10,14 @@ import "dotenv/config";
 // Middlewares
 import applyAuthMiddleware from "./middleware/auth.js";
 import verifyRequest from "./middleware/verify-request.js";
+import isActiveShop from "./middleware/isActiveShop.js";
+import csp from "./middleware/csp.js";
+import { sessionStorage } from "./helpers/sessionStorage.js";
+import appUninstallHandler from "./webhooks/appUninstallHandler.js";
 
 // Routes
 import fieldRouter from "./routes/fieldRoutes.js";
-import userRouter from "./routes/userRoutes.js";
+import storeRoutes from "./routes/storeRoutes.js";
 
 const prisma = new PrismaClient();
 
@@ -30,7 +34,8 @@ Shopify.Context.initialize({
   API_VERSION: LATEST_API_VERSION,
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
-  SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
+  // SESSION_STORAGE: new Shopify.Session.MemorySessionStorage(),
+  SESSION_STORAGE: sessionStorage,
 });
 
 // Storing the currently active shops in memory will force them to re-login when your server restarts. You should
@@ -38,9 +43,7 @@ Shopify.Context.initialize({
 const ACTIVE_SHOPIFY_SHOPS = {};
 Shopify.Webhooks.Registry.addHandler("APP_UNINSTALLED", {
   path: "/webhooks",
-  webhookHandler: async (topic, shop, body) => {
-    delete ACTIVE_SHOPIFY_SHOPS[shop];
-  },
+  webhookHandler: appUninstallHandler,
 });
 
 // export for test use only
@@ -59,10 +62,13 @@ export async function createServer(
 
   applyAuthMiddleware(app);
 
+  app.use(csp);
+  app.use(isActiveShop);
+
   // Routers
   app.use("/api/hello", (req, res) => res.json({ message: "Api works!" }));
   app.use("/api/v1/fields", fieldRouter);
-  app.use("/api/v1/users", userRouter);
+  app.use("/api/v1/stores", storeRoutes);
 
   app.post("/webhooks", async (req, res) => {
     try {
@@ -76,94 +82,75 @@ export async function createServer(
     }
   });
 
-  app.get("/api/v1/users", async (req, res, next) => {
+  app.get("/api/v1/stores", async (req, res, next) => {
     try {
-      const shops = await prisma.user.findMany();
+      const shops = await prisma.store.findMany();
       return res.json(shops);
     } catch (error) {
       next(error);
     }
   });
 
-  app.post("/api/v1/users", async (req, res, next) => {
-    // AFTER CREATE USER
-    // CREATE ALL FIELDS WITH OWNER ID
-    // CREATE CURRENT FIELDS
-    try {
-      const user = await prisma.user.create({
-        data: {
-          shop: "shop",
-          accessToken: "access token",
-        },
-      });
-      return res.json({
-        message: "user created!",
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
+  // app.get("/api/v1/fields", async (req, res, next) => {
+  //   try {
+  //     const shops = await prisma.field.findMany({});
+  //     return res.json(shops);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // });
 
-  app.get("/api/v1/fields", async (req, res, next) => {
-    try {
-      const shops = await prisma.field.findMany({});
-      return res.json(shops);
-    } catch (error) {
-      next(error);
-    }
-  });
+  // app.get("/api/v1/current-fields", async (req, res) => {
+  //   // NEED USER ID
+  //   const { userId } = req.query;
+  //   const test = await prisma.user.findMany({
+  //     where: {
+  //       id: userId,
+  //     },
+  //     include: {
+  //       currentFieldsOnUsers: { include: { field: true } },
+  //     },
+  //   });
+  //   // const getCurrentFields = await prisma.currentFieldsOnUsers.findMany({
+  //   //   where: {
+  //   //     userId
+  //   //   }
+  //   // });
+  //   res.json(test);
+  // });
 
-  app.get("/api/v1/current-fields", async (req, res) => {
-    // NEED USER ID
-    const { userId } = req.query;
-    const test = await prisma.user.findMany({
-      where: {
-        id: userId,
-      },
-      include: {
-        currentFieldsOnUsers: { include: { field: true } },
-      },
-    });
-    // const getCurrentFields = await prisma.currentFieldsOnUsers.findMany({
-    //   where: {
-    //     userId
-    //   }
-    // });
-    res.json(test);
-  });
+  // app.get("/api/v1/rest-fields", async (req, res) => {
+  //   const { userId } = req.query;
+  //   const fields = await prisma.field.findMany({
+  //     where: {
+  //       userId,
+  //     },
+  //   });
+  //   const currentFields = await prisma.currentFieldsOnUsers.findMany({
+  //     where: {
+  //       userId,
+  //     },
+  //   });
+  //   const restFields = fields.filter(
+  //     (field) =>
+  //       !currentFields.find((currentField) => currentField.fieldId === field.id)
+  //   );
+  //   res.json(restFields);
+  // });
 
-  app.get("/api/v1/rest-fields", async (req, res) => {
-    const { userId } = req.query;
-    const fields = await prisma.field.findMany({
-      where: {
-        userId,
-      },
-    });
-    const currentFields = await prisma.currentFieldsOnUsers.findMany({
-      where: {
-        userId,
-      },
-    });
-    const restFields = fields.filter(
-      (field) =>
-        !currentFields.find((currentField) => currentField.fieldId === field.id)
-    );
-    res.json(restFields);
-  });
+  // app.get("/products-count", verifyRequest(app), async (req, res) => {
+  //   const session = await Shopify.Utils.loadCurrentSession(
+  //     req,
+  //     res,
+  //     app.get("use-online-tokens")
+  //   );
+  //   const { Product } = await import(
+  //     `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
+  //   );
 
-  app.get("/products-count", verifyRequest(app), async (req, res) => {
-    const session = await Shopify.Utils.loadCurrentSession(
-      req,
-      res,
-      app.get("use-online-tokens")
-    );
-    const { Product } = await import(
-      `@shopify/shopify-api/dist/rest-resources/${Shopify.Context.API_VERSION}/index.js`
-    );
-
-    const countData = await Product.count({ session });
-    res.status(200).send(countData);
-  });
+  //   const countData = await Product.count({ session });
+  //   res.status(200).send(countData);
+  // });
 
   app.post("/graphql", verifyRequest(app), async (req, res) => {
     try {

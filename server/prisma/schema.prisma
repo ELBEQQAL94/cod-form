@@ -10,15 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Store {
   id                   String                 @id @default(uuid())
   shop                 String                 @unique
-  accessToken          String
+  isActive             Boolean                @default(false)
   title                String?                @default("free shipping today")
   subtitle             String?                @default("fill out the form to place your order")
   createdAt            DateTime               @default(now())
   fields               Field[]
   currentFieldsOnUsers CurrentFieldsOnUsers[]
+}
+
+model Session {
+  id      String @id @default(uuid())
+  content String
+  shop    String
 }
 
 model Field {
@@ -29,8 +35,8 @@ model Field {
   requiredMessage      String?
   ErrorMessage         String?
   required             Boolean?               @default(false)
-  owner                User                   @relation(fields: [userId], references: [id])
-  userId               String
+  owner                Store                  @relation(fields: [storeId], references: [id])
+  storeId              String
   currentFieldsOnUsers CurrentFieldsOnUsers[]
 }
 
@@ -55,10 +61,10 @@ model Field {
 // 			'updated' => '2022-08-23 17:39:04'
 
 model CurrentFieldsOnUsers {
-  user    User   @relation(fields: [userId], references: [id])
-  userId  String
+  store   Store  @relation(fields: [storeId], references: [id])
+  storeId String
   field   Field  @relation(fields: [fieldId], references: [id])
   fieldId String
 
-  @@id([userId, fieldId])
+  @@id([storeId, fieldId])
 }

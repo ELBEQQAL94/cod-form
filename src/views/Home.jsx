@@ -53,7 +53,7 @@ const Home = () => {
 
   const fetchUserId = async () => {
     const shopName = data.shop.myshopifyDomain;
-    const res = await fetch(`/api/v1/users/${shopName}`);
+    const res = await fetch(`/api/v1/stores/${shopName}`);
     const response = await res.json();
     // const response = await userApi.getUserIdApi(data.shop.myshopifyDomain);
     const userId = response.content.id;

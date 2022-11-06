@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const createFieldsQuery = async (userId) => {
+export const createFieldsQuery = async (storeId) => {
   await prisma.field.createMany({
     data: [
       {
@@ -10,7 +10,7 @@ export const createFieldsQuery = async (userId) => {
         placeholder: "First Name",
         requiredMessage: "First name is required",
         ErrorMessage: "First name should not contain any numeric characters",
-        userId,
+        storeId,
       },
       {
         label: "Last Name",
@@ -18,93 +18,93 @@ export const createFieldsQuery = async (userId) => {
         requiredMessage: "Last name is required",
         ErrorMessage: "Last name should not contain any numeric characters",
         required: true,
-        userId,
+        storeId,
       },
       {
         label: "Address line 1",
         placeholder: "Address line 1",
         requiredMessage: "Address is required",
         ErrorMessage: "Address is required",
-        userId,
+        storeId,
       },
       {
         label: "City",
         placeholder: "City",
         requiredMessage: "City is required",
         ErrorMessage: "City is required",
-        userId,
+        storeId,
       },
       {
         label: "Confirm phone",
         placeholder: "Confirm phone",
         requiredMessage: "Confirm phone is required",
         ErrorMessage: "Please retype the same phone number",
-        userId,
+        storeId,
       },
       {
         label: "Email",
         placeholder: "Email",
         requiredMessage: "Email is required",
         ErrorMessage: "Please enter a valid email address",
-        userId,
+        storeId,
       },
       {
         label: "Country",
         placeholder: "Country",
         requiredMessage: "Country is required",
-        userId,
+        storeId,
       },
       {
         label: "ZIP code",
         placeholder: "ZIP code",
         requiredMessage: "ZIP code is required",
-        userId,
+        storeId,
       },
       {
         label: "Address line 2",
         placeholder: "Address line 2",
         requiredMessage: "Address ligne 2 is required",
-        userId,
+        storeId,
       },
       {
         label: "Province",
         placeholder: "Province",
         requiredMessage: "Province is required",
-        userId,
+        storeId,
       },
       {
         label: "Note",
         placeholder: "Note",
         requiredMessage: "Note is required",
-        userId,
+        storeId,
       },
       {
         label: "Phone",
         placeholder: "Phone",
         requiredMessage: "Phone is required",
         ErrorMessage: "Please enter a valid phone number",
-        userId,
+        storeId,
       },
       {
         type: "button",
         label: "Confirm Order",
-        userId,
+        storeId,
       },
     ],
   });
 };
 
-export const createCurrentFieldsQuery = async (userId) => {
+export const createCurrentFieldsQuery = async (storeId) => {
   let currentFields = await prisma.field.findMany({
     where: {
-      userId,
+      storeId,
       label: {
         in: ["First Name", "Last Name", "Phone", "Email", "Address line 1"],
       },
     },
     select: {
       id: true,
-      userId: true,
+      storeId: true,
     },
   });
   currentFields = currentFields.map((field) => {
@@ -117,10 +117,10 @@ export const createCurrentFieldsQuery = async (userId) => {
   });
 };
 
-export const getCurrentFieldsQuery = async (userId) => {
+export const getCurrentFieldsQuery = async (storeId) => {
   const currentFields = await prisma.user.findMany({
     where: {
-      id: userId,
+      id: storeId,
     },
     include: {
       currentFieldsOnUsers: { include: { field: true } },
@@ -129,15 +129,15 @@ export const getCurrentFieldsQuery = async (userId) => {
   return currentFields;
 };
 
-export const getShopifyFieldsQuery = async (userId) => {
+export const getShopifyFieldsQuery = async (storeId) => {
   const fields = await prisma.field.findMany({
     where: {
-      userId,
+      storeId,
     },
   });
   const currentFields = await prisma.currentFieldsOnUsers.findMany({
     where: {
-      userId,
+      storeId,
     },
   });
   const restFields = fields.filter(
